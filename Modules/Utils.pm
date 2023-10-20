@@ -2,10 +2,11 @@ package Utils;
 
 use strict;
 use warnings;
+use DBI;
 use Exporter qw(import);
 
 our @ISA = qw(Exporter);
-our @EXPORT_OK = qw(validate_ipv6_address validate_ipv4_address);
+our @EXPORT_OK = qw(validate_ipv6_address validate_ipv4_address Get_Data Sum_Currency);
 
 # Validates whether the given string is a valid IPv6 address.
 #
@@ -54,5 +55,97 @@ sub validate_ipv4_address {
         return 0;
     }
 }
+
+sub Get_Data {
+    my $res = [
+        {
+            ID => 1,
+            CPT => '77771, LT',
+            BILLED => 50,
+            PAYMENT => 0,
+            CODES => [
+                {
+                    ID => 101,
+                    CODE => "PJ23",
+                    AMOUNT => 5,
+                },
+                {
+                    ID => 102,
+                    CODE => 'AB26',
+                    AMOUNT => 10,
+                },
+                {
+                    ID => 103,
+                    CODE => 'IT25',
+                    AMOUNT => 15,
+                }
+            ]
+        },
+        {
+            ID => 2,
+            CPT => '77771, RT',
+            BILLED => 50,
+            PAYMENT => 0,
+            CODES => [
+                {
+                    ID => 201,
+                    CODE => 'AB23',
+                    AMOUNT => 5,
+                },
+                {
+                    ID => 202,
+                    CODE => 'AB24',
+                    AMOUNT => 10,
+                },
+                {
+                    ID => 203,
+                    CODE => 'IT25',
+                    AMOUNT => 15,
+                }
+            ]
+        },
+        {
+            ID => 3,
+            CPT => '77771, 50',
+            PAYMENT => 100,
+            CODES => [
+                {
+                    ID => 301,
+                    CODE => 'AB23',
+                    AMOUNT => 5,
+                },
+                {
+                    ID => 302,
+                    CODE => 'AB24',
+                    AMOUNT => 10,
+                },
+                {
+                    ID => 303,
+                    CODE => 'IT25',
+                    AMOUNT => 15,
+                }
+            ]
+        }
+    ];
+
+    return $res;
+}
+
+sub Sum_Currency {
+    my ($d1, $d2) = @_;
+
+    my $sum = 0;
+
+    return $d1 + $d2;
+}
+
+sub Add_Code {
+    my ($dbh, $code) = @_;
+
+    my $sql = $dbh->prepare("INSERT INTO CODES (CODE, AMOUNT, SVCID) values (?, ?)");
+    $sql->execute($code->{CODE}, $code->{AMOUNT}, $code->{SVCID}) or die $DBI::errstr;
+    $sql->finish();
+
+    print "Successfully inserted code to database\n";}
 
 1;
